@@ -19,7 +19,7 @@ class UserListingsScreen extends StatefulWidget {
 class _UserListingsScreenState extends State<UserListingsScreen> {
   // Browse Tab Variables
   List<Listing> _listings = [];
-  List<Listing> _newListings = []; // For new products section
+  final List<Listing> _newListings = []; // For new products section
   bool _isLoading = false;
   String _searchQuery = '';
   String _selectedCategory = 'All';
@@ -28,7 +28,7 @@ class _UserListingsScreenState extends State<UserListingsScreen> {
   List<String> _departmentNames = ['All'];
   final TextEditingController _searchController = TextEditingController();
   bool _showFilters = false;
-  List<Map<String, dynamic>> _departments = [
+  final List<Map<String, dynamic>> _departments = [
     {
       'name': 'School of Information Technology Education',
       'logo': 'assets/logos/site.png',
@@ -124,7 +124,7 @@ class _UserListingsScreenState extends State<UserListingsScreen> {
       
       setState(() {
         _listings = listings;
-        _categories = ['All', ...listings.map((l) => l.category?.name ?? 'Unknown').toSet().toList()];
+        _categories = ['All', ...listings.map((l) => l.category?.name ?? 'Unknown').toSet()];
         _isLoading = false;
       });
     } catch (e) {
@@ -143,7 +143,7 @@ class _UserListingsScreenState extends State<UserListingsScreen> {
     try {
       final departments = await UserService.getDepartments();
       setState(() {
-        _departmentNames = ['All', ...departments.map((d) => d['name'] as String).toList()];
+        _departmentNames = ['All', ...departments.map((d) => d['name'] as String)];
       });
     } catch (e) {
       print('Error loading departments: $e');
@@ -750,7 +750,7 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  int _currentImageIndex = 0;
+  final int _currentImageIndex = 0;
   int _quantity = 1;
   final PageController _pageController = PageController();
 

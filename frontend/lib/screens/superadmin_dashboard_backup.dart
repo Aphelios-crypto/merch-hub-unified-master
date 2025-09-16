@@ -195,7 +195,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard>
             children: [
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  value: _selectedRoleFilter,
+                  initialValue: _selectedRoleFilter,
                   decoration: const InputDecoration(
                     labelText: 'Role',
                     border: OutlineInputBorder(),
@@ -217,7 +217,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard>
               const SizedBox(width: 16),
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  value: _selectedDepartmentFilter,
+                  initialValue: _selectedDepartmentFilter,
                   decoration: const InputDecoration(
                     labelText: 'Department',
                     border: OutlineInputBorder(),

@@ -496,7 +496,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                         const SizedBox(height: 16),
 
                         // Product Images
-                        Container(
+                        SizedBox(
                           height: 300,
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(0),

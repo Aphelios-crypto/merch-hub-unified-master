@@ -1060,8 +1060,8 @@ class _AdminListingsScreenState extends State<AdminListingsScreen> {
                       const SizedBox(height: 8),
                       Text(
                         discountType == 'percentage'
-                            ? '${discountValue}% off'
-                            : '₱${discountValue} off',
+                            ? '$discountValue% off'
+                            : '₱$discountValue off',
                         style: const TextStyle(
                           fontSize: 16,
                           color: Colors.green,

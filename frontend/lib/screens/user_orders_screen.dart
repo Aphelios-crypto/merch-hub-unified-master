@@ -7,7 +7,7 @@ import 'receipt_upload_screen.dart';
 import 'reservation_fee_payment_screen.dart';
 
 class UserOrdersScreen extends StatefulWidget {
-  const UserOrdersScreen({Key? key}) : super(key: key);
+  const UserOrdersScreen({super.key});
 
   @override
   State<UserOrdersScreen> createState() => _UserOrdersScreenState();

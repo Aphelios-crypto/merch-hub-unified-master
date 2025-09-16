@@ -13,12 +13,12 @@ class EditListingScreen extends StatefulWidget {
   final VoidCallback? onListingUpdated;
 
   const EditListingScreen({
-    Key? key,
+    super.key,
     required this.listing,
     required this.userSession,
     this.categories,
     this.onListingUpdated,
-  }) : super(key: key);
+  });
 
   @override
   _EditListingScreenState createState() => _EditListingScreenState();
@@ -30,8 +30,8 @@ class _EditListingScreenState extends State<EditListingScreen> {
   final _priceController = TextEditingController();
   final _stockController = TextEditingController();
   
-  List<File> _selectedImages = [];
-  List<int> _imagesToRemove = [];
+  final List<File> _selectedImages = [];
+  final List<int> _imagesToRemove = [];
   String _selectedStatus = 'pending';
   int? _selectedCategoryId;
   
@@ -229,7 +229,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
                       border: OutlineInputBorder(),
                     ),
                     style: const TextStyle(fontFamily: 'Montserrat', color: Colors.black),
-                    value: _selectedCategoryId,
+                    initialValue: _selectedCategoryId,
                     items: _categories
                         .map((cat) => DropdownMenuItem<int>(
                               value: cat.id,

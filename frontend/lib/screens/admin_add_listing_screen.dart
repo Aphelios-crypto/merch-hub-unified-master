@@ -88,12 +88,10 @@ class _AdminAddListingScreenState extends State<AdminAddListingScreen> {
 
   Future<void> _pickImages() async {
     final pickedFiles = await _picker.pickMultiImage();
-    if (pickedFiles != null) {
-      setState(() {
-        _selectedImages = pickedFiles.map((xFile) => File(xFile.path)).toList();
-      });
+    setState(() {
+      _selectedImages = pickedFiles.map((xFile) => File(xFile.path)).toList();
+    });
     }
-  }
 
   Future<void> _createListing() async {
     // Basic validation
@@ -306,7 +304,7 @@ class _AdminAddListingScreenState extends State<AdminAddListingScreen> {
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<int>(
-                    value: _selectedCategoryId,
+                    initialValue: _selectedCategoryId,
                     style: const TextStyle(fontFamily: 'Montserrat', color: Colors.black),
                     decoration: const InputDecoration(
                       labelText: 'Category',

@@ -227,7 +227,7 @@ class _SuperAdminEditListingScreenState extends State<SuperAdminEditListingScree
                   SizedBox(
                     width: double.infinity,
                     child: DropdownButtonFormField<String>(
-                      value: selectedStatus,
+                      initialValue: selectedStatus,
                       decoration: const InputDecoration(
                         labelText: 'Status',
                         border: OutlineInputBorder(),
@@ -272,7 +272,7 @@ class _SuperAdminEditListingScreenState extends State<SuperAdminEditListingScree
                             ),
                           )
                         : DropdownButtonFormField<int>(
-                            value: selectedDepartmentId,
+                            initialValue: selectedDepartmentId,
                             decoration: const InputDecoration(
                               labelText: 'Department',
                               border: OutlineInputBorder(),
@@ -322,7 +322,7 @@ class _SuperAdminEditListingScreenState extends State<SuperAdminEditListingScree
                             ),
                           )
                         : DropdownButtonFormField<int>(
-                            value: selectedCategoryId,
+                            initialValue: selectedCategoryId,
                             decoration: const InputDecoration(
                               labelText: 'Category',
                               border: OutlineInputBorder(),

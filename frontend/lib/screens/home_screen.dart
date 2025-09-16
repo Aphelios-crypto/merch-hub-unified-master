@@ -7,7 +7,7 @@ import '../services/auth_services.dart';
 import '../services/guest_service.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -83,11 +83,11 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         } else {
           // Redirect to login for non-guest users without authentication
-          Navigator.of(context).pushReplacementNamed("/login");
+          Navigator.of(context).pushReplacementNamed('/login');
         }
       }
     } catch (e) {
-      debugPrint("Error checking user role: $e");
+      debugPrint('Error checking user role: $e');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

@@ -293,8 +293,8 @@ class _AdminDiscountCodesScreenState extends State<AdminDiscountCodesScreen> {
                       const SizedBox(height: 8),
                       Text(
                         discountType == 'percentage'
-                            ? '${discountValue}% off'
-                            : '₱${discountValue} off',
+                            ? '$discountValue% off'
+                            : '₱$discountValue off',
                         style: const TextStyle(
                           fontSize: 16,
                           color: Colors.green,
@@ -445,7 +445,7 @@ class _CreateDiscountCodeDialogState extends State<CreateDiscountCodeDialog> {
                   children: [
                     Expanded(
                       child: DropdownButtonFormField<String>(
-                        value: _discountType,
+                        initialValue: _discountType,
                         decoration: const InputDecoration(
                           labelText: 'Discount Type',
                         ),
@@ -495,7 +495,7 @@ class _CreateDiscountCodeDialogState extends State<CreateDiscountCodeDialog> {
                 const SizedBox(height: 16),
                 if (widget.userSession.isSuperAdmin) ...[
                   DropdownButtonFormField<int?>(
-                    value: _selectedDepartmentId,
+                    initialValue: _selectedDepartmentId,
                     decoration: const InputDecoration(
                       labelText: 'Department',
                     ),

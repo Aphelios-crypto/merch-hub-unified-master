@@ -10,7 +10,7 @@ import 'superadmin_edit_listing_screen.dart';
 class ProductsScreen extends StatefulWidget {
   final UserSession userSession;
 
-  const ProductsScreen({Key? key, required this.userSession}) : super(key: key);
+  const ProductsScreen({super.key, required this.userSession});
 
   @override
   _ProductsScreenState createState() => _ProductsScreenState();
@@ -125,7 +125,7 @@ class _ProductsScreenState extends State<ProductsScreen> with SingleTickerProvid
 
         // Category filter
         bool matchesCategory = _selectedCategoryFilter == 'all' ||
-            (listing.category?.name?.toLowerCase() == _selectedCategoryFilter.toLowerCase());
+            (listing.category?.name.toLowerCase() == _selectedCategoryFilter.toLowerCase());
 
         return matchesSearch && matchesStatus && matchesCategory;
       }).toList();
@@ -141,7 +141,7 @@ class _ProductsScreenState extends State<ProductsScreen> with SingleTickerProvid
     Set<String> uniqueCategories = {};
     for (var listing in _listings) {
       if (listing.category?.name != null) {
-        uniqueCategories.add(listing.category!.name!);
+        uniqueCategories.add(listing.category!.name);
       }
     }
 
@@ -222,7 +222,7 @@ class _ProductsScreenState extends State<ProductsScreen> with SingleTickerProvid
                     // Status Filter
                     Expanded(
                       child: DropdownButtonFormField<String>(
-                        value: _selectedStatusFilter,
+                        initialValue: _selectedStatusFilter,
                         decoration: InputDecoration(
                           labelText: 'Status',
                           border: OutlineInputBorder(
@@ -248,7 +248,7 @@ class _ProductsScreenState extends State<ProductsScreen> with SingleTickerProvid
                     // Category Filter
                     Expanded(
                       child: DropdownButtonFormField<String>(
-                        value: _selectedCategoryFilter,
+                        initialValue: _selectedCategoryFilter,
                         decoration: InputDecoration(
                           labelText: 'Category',
                           border: OutlineInputBorder(
@@ -1002,7 +1002,7 @@ class _ProductsScreenState extends State<ProductsScreen> with SingleTickerProvid
                   labelText: 'Category',
                   border: OutlineInputBorder(),
                 ),
-                value: selectedCategoryId,
+                initialValue: selectedCategoryId,
                 items: categories.map((category) {
                   return DropdownMenuItem<int>(
                     value: category['id'],
@@ -1028,7 +1028,7 @@ class _ProductsScreenState extends State<ProductsScreen> with SingleTickerProvid
                   labelText: 'Department',
                   border: OutlineInputBorder(),
                 ),
-                value: selectedDepartmentId,
+                initialValue: selectedDepartmentId,
                 isExpanded: true,
                 items: departments.map((department) {
                   return DropdownMenuItem<int>(
@@ -1176,7 +1176,7 @@ class _ProductsScreenState extends State<ProductsScreen> with SingleTickerProvid
               labelText: 'Status',
               border: OutlineInputBorder(),
             ),
-            value: selectedStatus,
+            initialValue: selectedStatus,
             items: const [
               DropdownMenuItem(value: 'pending', child: Text('Pending')),
               DropdownMenuItem(value: 'approved', child: Text('Approved')),

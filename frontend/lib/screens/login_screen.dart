@@ -177,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Center(
                       child: Column(
                         children: [
-                          Container(
+                          SizedBox(
                             height: 220,
                             width: 450,
                             child: Image.asset(

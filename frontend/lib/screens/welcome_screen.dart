@@ -89,7 +89,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                 ),
                                  Transform.translate(
                                    offset: const Offset(0, -10),
-                                   child: Container(
+                                   child: SizedBox(
                                      height: 220,
                                      width: 450,
                                      child: Image.asset(

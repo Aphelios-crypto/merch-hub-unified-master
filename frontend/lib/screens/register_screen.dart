@@ -28,7 +28,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   String? _selectedDepartment;
-  String _selectedRole = 'student';
+  final String _selectedRole = 'student';
 
   final List<Map<String, dynamic>> _departments = [
     {
@@ -199,7 +199,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Center(
                       child: Column(
                         children: [
-                          Container(
+                          SizedBox(
                             height: 220,
                             width: 450,
                             child: Image.asset(
@@ -367,7 +367,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             SizedBox(
                               width: double.infinity,
                               child: DropdownButtonFormField<String>(
-                                value: _selectedDepartment,
+                                initialValue: _selectedDepartment,
                                 decoration: AuthStyles.getInputDecoration(
                                   labelText: 'Department',
                                   prefixIcon: Icons.school_outlined,

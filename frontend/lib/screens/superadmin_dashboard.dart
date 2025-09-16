@@ -109,7 +109,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
           _availableDepartments = ['All'];
           final departments = users
               .map((user) => user.departmentName)
-              .where((dept) => dept != null && dept!.isNotEmpty)
+              .where((dept) => dept != null && dept.isNotEmpty)
               .map((dept) => dept!)
               .toSet();
           _availableDepartments.addAll(departments.toList());
@@ -360,7 +360,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
                       // Department Filter
                       DropdownButtonFormField<String>(
                         isExpanded: true,
-                        value: _selectedDepartmentFilter ?? 'All',
+                        initialValue: _selectedDepartmentFilter ?? 'All',
                         decoration: const InputDecoration(
                           labelText: 'Department',
                           border: OutlineInputBorder(),
@@ -388,7 +388,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
                       const SizedBox(height: 16),
                       // Role Filter
                       DropdownButtonFormField<String>(
-                        value: _selectedRoleFilter ?? 'All',
+                        initialValue: _selectedRoleFilter ?? 'All',
                         decoration: const InputDecoration(
                           labelText: 'Role',
                           border: OutlineInputBorder(),
@@ -1674,11 +1674,13 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
       // Role filter
       if (_selectedRoleFilter != null && _selectedRoleFilter != 'All') {
         String userRole = _getRoleString(user.role);
-        if (_selectedRoleFilter == 'Student' && userRole != 'student')
+        if (_selectedRoleFilter == 'Student' && userRole != 'student') {
           return false;
+        }
         if (_selectedRoleFilter == 'Admin' && userRole != 'admin') return false;
-        if (_selectedRoleFilter == 'SuperAdmin' && userRole != 'superadmin')
+        if (_selectedRoleFilter == 'SuperAdmin' && userRole != 'superadmin') {
           return false;
+        }
       }
 
       return true;
@@ -2072,7 +2074,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
     bool isLoading = true;
 
     // Per-size stock controllers for clothing
-    final Map<String, TextEditingController> _sizeQtyControllers = {
+    final Map<String, TextEditingController> sizeQtyControllers = {
       'XS': TextEditingController(),
       'S': TextEditingController(),
       'M': TextEditingController(),
@@ -2080,7 +2082,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
       'XL': TextEditingController(),
       'XXL': TextEditingController(),
     };
-    final List<String> _clothingSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+    final List<String> clothingSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
     bool isClothingSelected = false;
 
     // Load data first
@@ -2185,7 +2187,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
 
                 // Category Dropdown
                 DropdownButtonFormField<int>(
-                  value: selectedCategoryId,
+                  initialValue: selectedCategoryId,
                   decoration: const InputDecoration(
                     labelText: 'Category',
                     labelStyle: TextStyle(fontFamily: 'Montserrat'),
@@ -2225,7 +2227,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DropdownButtonFormField<int>(
-                      value: selectedDepartmentId,
+                      initialValue: selectedDepartmentId,
                       decoration: const InputDecoration(
                         labelText: 'Department',
                         labelStyle: TextStyle(fontFamily: 'Montserrat'),
@@ -2312,10 +2314,10 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  ..._clothingSizes
+                  ...clothingSizes
                       .map(
                         (size) {
-                          final controller = _sizeQtyControllers[size]!;
+                          final controller = sizeQtyControllers[size]!;
                           final stockQty = int.tryParse(controller.text.trim()) ?? 0;
                           final isAvailable = stockQty > 0;
                           
@@ -2396,7 +2398,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
                           );
                         },
                       )
-                      .toList(),
+                      ,
                 ] else ...[
                   // Single Stock Quantity for non-clothing
                   TextFormField(
@@ -2421,7 +2423,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
                 const SizedBox(height: 16),
 
                 DropdownButtonFormField<String>(
-                  value: selectedStatus,
+                  initialValue: selectedStatus,
                   decoration: const InputDecoration(
                     labelText: 'Status',
                     labelStyle: TextStyle(fontFamily: 'Montserrat'),
@@ -2665,7 +2667,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
                   if (isClothingSelected) {
                     // Process all sizes (allow 0 stock for preorders)
                     final sizeVariants = <Map<String, dynamic>>[];
-                    for (final entry in _sizeQtyControllers.entries) {
+                    for (final entry in sizeQtyControllers.entries) {
                       final qty = int.tryParse(entry.value.text.trim()) ?? 0;
                       sizeVariants.add({
                         'size': entry.key,
@@ -2950,7 +2952,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
                 ],
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: selectedStatus,
+                  initialValue: selectedStatus,
                   decoration: const InputDecoration(
                     labelText: 'Status',
                     border: OutlineInputBorder(),

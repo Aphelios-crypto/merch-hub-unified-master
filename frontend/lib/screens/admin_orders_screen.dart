@@ -8,8 +8,7 @@ class AdminOrdersScreen extends StatefulWidget {
   final UserSession userSession;
   final bool showAppBar;
 
-  const AdminOrdersScreen({Key? key, required this.userSession, this.showAppBar = true})
-    : super(key: key);
+  const AdminOrdersScreen({super.key, required this.userSession, this.showAppBar = true});
 
   @override
   State<AdminOrdersScreen> createState() => _AdminOrdersScreenState();
@@ -196,7 +195,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                       },
                     ),
                   )
-                  .toList(),
+                  ,
             ],
           ),
           actions: [

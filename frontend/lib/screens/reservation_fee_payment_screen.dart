@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import '../models/order.dart';
-import '../services/order_service.dart';
 import 'receipt_upload_screen.dart';
 
 class ReservationFeePaymentScreen extends StatefulWidget {
