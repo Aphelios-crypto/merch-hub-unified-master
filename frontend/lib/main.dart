@@ -10,6 +10,7 @@ import 'screens/admin_listings_screen.dart';
 import 'screens/user_listings_screen.dart';
 import 'screens/admin_add_listing_screen.dart';
 import 'screens/order_confirmation_screen.dart';
+import 'screens/profile_screen.dart';
 import 'models/user_role.dart';
 import 'models/listing.dart';
 
@@ -79,6 +80,7 @@ class UDDEssentialsApp extends StatelessWidget {
           return OrderConfirmationScreen(listing: listing);
         },
         '/admin-add-listing': (context) => const AdminAddListingScreen(),
+        '/profile': (context) => const ProfileScreen(),
       },
     );
   }

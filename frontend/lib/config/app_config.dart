@@ -1,7 +1,18 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppConfig {
   static const bool isDevelopment = true;
+
+  static Future<Map<String, String>> getHeaders() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+      'Accept': 'application/json',
+    };
+  }
 
   static String get baseUrl {
     final fromEnv = dotenv.env['API_BASE_URL']?.trim();

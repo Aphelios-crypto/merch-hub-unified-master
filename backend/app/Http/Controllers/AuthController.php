@@ -27,8 +27,14 @@ class AuthController extends Controller
             'role' => $validated['role'],
         ]);
 
+        // Create user profile with registration information
+        $user->profile()->create([
+            'full_name' => $validated['name'],
+            'email' => $validated['email'],
+        ]);
+
         // Load department relationship for session data
-        $user->load('department');
+        $user->load(['department', 'profile']);
 
         // Generate token using Sanctum
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -52,8 +58,17 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
-        // Load department relationship for session data
-        $user->load('department');
+        // Load department and profile relationships for session data
+        $user->load(['department', 'profile']);
+
+        // Create profile if it doesn't exist
+        if (!$user->profile) {
+            $user->profile()->create([
+                'full_name' => $user->name,
+                'email' => $user->email,
+            ]);
+            $user->load('profile');
+        }
         
         $token = $user->createToken('auth_token')->plainTextToken;
 

@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ListingController;
@@ -105,6 +106,11 @@ Route::post('/simple-orders', [OrderController::class, 'simpleStore']);
 Route::get('/simple-orders', [OrderController::class, 'simpleIndex']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    // Profile routes
+    Route::get('/profile', [ProfileController::class, 'show']);
+    Route::post('/profile', [ProfileController::class, 'update']);
+    Route::post('/profile/avatar', [ProfileController::class, 'uploadAvatar']);
+    Route::post('/profile/preferences', [ProfileController::class, 'updatePreferences']);
     // Basic authenticated routes
     Route::get('/user', [UserController::class, 'show']);
     Route::get('/user/permissions', [UserController::class, 'permissions']);

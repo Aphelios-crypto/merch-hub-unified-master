@@ -5,7 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens; // ✅ Add this
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\HasOne; // ✅ Add this
 
 class User extends Authenticatable
 {
@@ -51,6 +52,11 @@ class User extends Authenticatable
     public function department()
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function profile(): HasOne
+    {
+        return $this->hasOne(UserProfile::class);
     }
 
     public function notifications()
@@ -108,6 +114,7 @@ class User extends Authenticatable
             'role' => $this->role,
             'departmentId' => $this->department_id,
             'departmentName' => $this->department?->name,
+            'profile' => $this->profile,
         ];
     }
 }

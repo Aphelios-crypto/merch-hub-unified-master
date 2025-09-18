@@ -10,6 +10,7 @@ class UserSession {
   final UserRole role;
   final int? departmentId; // null for superAdmin, specific dept for admin
   final String? departmentName;
+  final Map<String, dynamic>? profile;
 
   UserSession({
     required this.userId,
@@ -18,6 +19,7 @@ class UserSession {
     required this.role,
     this.departmentId,
     this.departmentName,
+    this.profile,
   });
 
   bool get isSuperAdmin => role == UserRole.superAdmin;
@@ -54,6 +56,7 @@ class UserSession {
       role: role,
       departmentId: json['departmentId'],
       departmentName: json['departmentName'],
+      profile: json['profile'] as Map<String, dynamic>?,
     );
   }
 
@@ -78,6 +81,7 @@ class UserSession {
       'role': roleString,
       'departmentId': departmentId,
       'departmentName': departmentName,
+      'profile': profile
     };
   }
 

@@ -9,6 +9,7 @@ import '../config/app_config.dart';
 import 'user_orders_screen.dart';
 import 'order_confirmation_screen.dart';
 import 'notifications_screen.dart';
+import 'profile_screen.dart';
 
 class UserHomeScreen extends StatefulWidget {
   final bool isGuest;
@@ -215,6 +216,36 @@ class _UserHomeScreenState extends State<UserHomeScreen> with WidgetsBindingObse
               Navigator.pop(context);
             },
           ),
+          if (!_isGuest)
+            ListTile(
+              leading: const Icon(Icons.person, color: Color(0xFF1E3A8A)),
+              title: const Text('Profile'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              },
+            ),
+          if (_isGuest)
+            ListTile(
+              leading: const Icon(Icons.person, color: Colors.grey),
+              title: const Text('Profile', style: TextStyle(color: Colors.grey)),
+              onTap: () async {
+                Navigator.pop(context);
+                final loggedIn = await GuestService.promptLogin(
+                  context, 
+                  'view_profile',
+                  returnRoute: '/home',
+                );
+                if (loggedIn) {
+                  _checkGuestStatus();
+                }
+              },
+            ),
           ListTile(
             leading: const Icon(Icons.search, color: Color(0xFF1E3A8A)),
             title: const Text('Browse Products'),
@@ -764,7 +795,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> with WidgetsBindingObse
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 1.0, right: 12.0),
+            padding: const EdgeInsets.symmetric(horizontal: 1.0),
             child: IconButton(
               icon: const Icon(Icons.shopping_bag_outlined, color: Colors.black),
               onPressed: () async {
@@ -782,6 +813,31 @@ class _UserHomeScreenState extends State<UserHomeScreen> with WidgetsBindingObse
                     context,
                     MaterialPageRoute(
                       builder: (context) => const UserOrdersScreen(),
+                    ),
+                  );
+                }
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 1.0, right: 12.0),
+            child: IconButton(
+              icon: const Icon(Icons.person_outline, color: Colors.black),
+              onPressed: () async {
+                if (_isGuest) {
+                  final loggedIn = await GuestService.promptLogin(
+                    context, 
+                    'view_profile',
+                    returnRoute: '/home',
+                  );
+                  if (loggedIn) {
+                    _checkGuestStatus();
+                  }
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProfileScreen(),
                     ),
                   );
                 }

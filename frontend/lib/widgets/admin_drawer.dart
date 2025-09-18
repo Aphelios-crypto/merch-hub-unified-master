@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../screens/profile_screen.dart';
 
 class AdminDrawer extends StatelessWidget {
   final int selectedPage;
@@ -139,6 +140,12 @@ class AdminDrawer extends StatelessWidget {
                 Icons.settings,
                 'System Settings',
                 const Color(0xFF0891B2),
+              ),
+              _buildDrawerItem(
+                8,
+                Icons.person,
+                'Profile',
+                const Color(0xFF6366F1),
               ),
             ],
           ),
