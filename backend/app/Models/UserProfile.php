@@ -15,11 +15,18 @@ class UserProfile extends Model
         'bio',
         'phone_number',
         'address',
+        'birth_date',
+        'gender',
+        'occupation',
+        'interests',
+        'social_links',
         'preferences'
     ];
 
     protected $casts = [
-        'preferences' => 'array'
+        'preferences' => 'array',
+        'interests' => 'array',
+        'social_links' => 'array'
     ];
 
     protected $hidden = [

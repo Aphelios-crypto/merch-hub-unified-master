@@ -11,7 +11,7 @@ class UserProfile {
   final String? gender;
   final String? occupation;
   final List<String>? interests;
-  final String? website;
+
   final Map<String, String>? socialLinks;
   final Map<String, dynamic>? preferences;
 
@@ -28,27 +28,72 @@ class UserProfile {
     this.gender,
     this.occupation,
     this.interests,
-    this.website,
+
     this.socialLinks,
     this.preferences,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
+    // Handle null or non-list interests
+    List<String>? interestsList;
+    if (json['interests'] != null) {
+      if (json['interests'] is List) {
+        interestsList = List<String>.from(json['interests'].map((i) => i.toString()));
+      }
+    }
+    
+    // Handle null or non-map social links
+    Map<String, String>? socialLinksMap;
+    if (json['social_links'] != null) {
+      if (json['social_links'] is Map) {
+        socialLinksMap = Map<String, String>.from(
+          json['social_links'].map((key, value) => MapEntry(key.toString(), value.toString()))
+        );
+      }
+    }
+    
+    // Safely parse id and userId with multiple fallbacks
+    int id = 0;
+    int userId = 0;
+    
+    try {
+      if (json['id'] != null) {
+        if (json['id'] is int) {
+          id = json['id'];
+        } else {
+          id = int.tryParse(json['id'].toString()) ?? 0;
+        }
+      }
+      
+      if (json['user_id'] != null) {
+        if (json['user_id'] is int) {
+          userId = json['user_id'];
+        } else {
+          userId = int.tryParse(json['user_id'].toString()) ?? 0;
+        }
+      }
+    } catch (e) {
+      print('Error parsing id or user_id: $e');
+      // Fallback to default values
+      id = 0;
+      userId = 0;
+    }
+    
     return UserProfile(
-      id: json['id'],
-      userId: json['user_id'],
-      avatarUrl: json['avatar_url'],
-      fullName: json['full_name'],
-      email: json['email'],
-      bio: json['bio'],
-      phoneNumber: json['phone_number'],
-      address: json['address'],
-      birthDate: json['birth_date'],
-      gender: json['gender'],
-      occupation: json['occupation'],
-      interests: json['interests'] != null ? List<String>.from(json['interests']) : null,
-      website: json['website'],
-      socialLinks: json['social_links'] != null ? Map<String, String>.from(json['social_links']) : null,
+      id: id,
+      userId: userId,
+      avatarUrl: json['avatar_url']?.toString(),
+      fullName: json['full_name']?.toString(),
+      email: json['email']?.toString(),
+      bio: json['bio']?.toString(),
+      phoneNumber: json['phone_number']?.toString(),
+      address: json['address']?.toString(),
+      birthDate: json['birth_date']?.toString(),
+      gender: json['gender']?.toString(),
+      occupation: json['occupation']?.toString(),
+      interests: interestsList,
+
+      socialLinks: socialLinksMap,
       preferences: json['preferences'],
     );
   }
@@ -67,7 +112,7 @@ class UserProfile {
       'gender': gender,
       'occupation': occupation,
       'interests': interests,
-      'website': website,
+
       'social_links': socialLinks,
       'preferences': preferences,
     };
@@ -86,7 +131,7 @@ class UserProfile {
     String? gender,
     String? occupation,
     List<String>? interests,
-    String? website,
+
     Map<String, String>? socialLinks,
     Map<String, dynamic>? preferences,
   }) {
@@ -103,7 +148,7 @@ class UserProfile {
       gender: gender ?? this.gender,
       occupation: occupation ?? this.occupation,
       interests: interests ?? this.interests,
-      website: website ?? this.website,
+
       socialLinks: socialLinks ?? this.socialLinks,
       preferences: preferences ?? this.preferences,
     );

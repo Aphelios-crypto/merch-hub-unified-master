@@ -23,6 +23,11 @@ class ProfileController extends Controller
             'bio' => 'nullable|string|max:500',
             'phone_number' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
+            'birth_date' => 'nullable|string|max:255',
+            'gender' => 'nullable|string|max:50',
+            'occupation' => 'nullable|string|max:255',
+            'interests' => 'nullable|array',
+            'social_links' => 'nullable|array',
             'preferences' => 'nullable|array'
         ]);
 
@@ -39,6 +44,11 @@ class ProfileController extends Controller
             'bio',
             'phone_number',
             'address',
+            'birth_date',
+            'gender',
+            'occupation',
+            'interests',
+            'social_links',
             'preferences'
         ]));
 

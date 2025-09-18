@@ -27,7 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _birthDateController = TextEditingController();
   final _genderController = TextEditingController();
   final _occupationController = TextEditingController();
-  final _websiteController = TextEditingController();
+
   List<String> _interests = [];
   Map<String, String> _socialLinks = {};
 
@@ -41,6 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() => _isLoading = true);
     try {
       final profile = await _profileService.getProfile();
+      if (!mounted) return;
       setState(() {
         _profile = profile;
         _fullNameController.text = profile.fullName ?? '';
@@ -51,16 +52,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _birthDateController.text = profile.birthDate ?? '';
         _genderController.text = profile.gender ?? '';
         _occupationController.text = profile.occupation ?? '';
-        _websiteController.text = profile.website ?? '';
+
         _interests = profile.interests ?? [];
         _socialLinks = profile.socialLinks ?? {};
+        
+        // Debug: Print social links to console
+        print('Social Links: $_socialLinks');
+        print('Profile Social Links: ${profile.socialLinks}');
       });
     } catch (e) {
+      if (!mounted) return;
+      String errorMessage = e.toString();
+      // Clean up the error message for display
+      if (errorMessage.startsWith('Exception: ')) {
+        errorMessage = errorMessage.substring('Exception: '.length);
+      }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading profile: $e')),
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red[700],
+          duration: const Duration(seconds: 5),
+        ),
       );
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -111,7 +128,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         birthDate: _birthDateController.text,
         gender: _genderController.text,
         occupation: _occupationController.text,
-        website: _websiteController.text,
+
         interests: _interests,
         socialLinks: _socialLinks,
       );
@@ -129,115 +146,135 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildViewMode() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Stack(
-          children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: _profile?.avatarUrl != null
-                  ? NetworkImage(_profile!.avatarUrl!)
-                  : null,
-              child: _profile?.avatarUrl == null
-                  ? const Icon(Icons.person, size: 50)
-                  : null,
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    
+    if (_profile == null) {
+      return const Center(
+        child: Text(
+          'Failed to load profile. Please try again.',
+          style: TextStyle(fontSize: 16),
+        ),
+      );
+    }
+    
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Stack(
+            children: [
+              CircleAvatar(
+                radius: 50,
+                backgroundImage: _profile?.avatarUrl != null
+                    ? NetworkImage(_profile!.avatarUrl!)
+                    : null,
+                child: _profile?.avatarUrl == null
+                    ? const Icon(Icons.person, size: 50)
+                    : null,
+              ),
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: IconButton(
+                  icon: const Icon(Icons.camera_alt),
+                  onPressed: _pickImage,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            _profile?.fullName ?? 'No name added',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          Text(
+            _profile?.email ?? 'No email added',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.grey[600],
             ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Text(
-          _profile?.fullName ?? 'No name added',
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
-        Text(
-          _profile?.email ?? 'No email added',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        const SizedBox(height: 24),
-        Card(
-          elevation: 2,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'About Me',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(_profile?.bio ?? 'Bio'),
-                const SizedBox(height: 16),
-                const Text(
-                  'Personal Information',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                ListTile(
-                  leading: const Icon(Icons.work),
-                  title: Text(_profile?.occupation ?? 'Occupation'),
-                  contentPadding: EdgeInsets.zero,
-                ),
-                ListTile(
-                  leading: const Icon(Icons.cake),
-                  title: Text(_profile?.birthDate ?? 'Birth Date'),
-                  contentPadding: EdgeInsets.zero,
-                ),
-                ListTile(
-                  leading: const Icon(Icons.person_outline),
-                  title: Text(_profile?.gender ?? 'Gender'),
-                  contentPadding: EdgeInsets.zero,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Contact Information',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                ListTile(
-                  leading: const Icon(Icons.phone),
-                  title: Text(_profile?.phoneNumber ?? 'Phone Number'),
-                  contentPadding: EdgeInsets.zero,
-                ),
-                ListTile(
-                  leading: const Icon(Icons.location_on),
-                  title: Text(_profile?.address ?? 'Address'),
-                  contentPadding: EdgeInsets.zero,
-                ),
-                ListTile(
-                  leading: const Icon(Icons.language),
-                  title: Text(_profile?.website ?? 'Profile Link'),
-                  contentPadding: EdgeInsets.zero,
-                ),
-                const SizedBox(height: 16),
-                if (_profile?.interests?.isNotEmpty ?? false) ...[                  
+          ),
+          const SizedBox(height: 24),
+          Card(
+            elevation: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   const Text(
-                    'Interests',
+                    'About Me',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    children: _profile!.interests!.map((interest) => Chip(
-                      label: Text(interest),
-                    )).toList(),
+                  Text(_profile?.bio ?? 'Add your bio'),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Personal Information',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ListTile(
+                    leading: const Icon(Icons.work),
+                    title: Text(_profile?.occupation ?? 'Add occupation'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.cake),
+                    title: Text(_profile?.birthDate ?? 'Add birth date'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.person_outline),
+                    title: Text(_profile?.gender ?? 'Add gender'),
+                    contentPadding: EdgeInsets.zero,
                   ),
                   const SizedBox(height: 16),
-                ],
-                if (_profile?.socialLinks?.isNotEmpty ?? false) ...[                  
+                  const Text(
+                    'Contact Information',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ListTile(
+                    leading: const Icon(Icons.phone),
+                    title: Text(_profile?.phoneNumber ?? 'Phone Number'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.location_on),
+                    title: Text(_profile?.address ?? 'Address'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+
+                  const SizedBox(height: 16),
+                  if (_profile?.interests?.isNotEmpty ?? false) ...[                  
+                    const Text(
+                      'Interests',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: _profile?.interests?.map((interest) => Chip(
+                        label: Text(interest),
+                      )).toList() ?? [],
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  // Always show Social Links section header
                   const Text(
                     'Social Links',
                     style: TextStyle(
@@ -246,18 +283,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  ..._profile!.socialLinks!.entries.map((entry) => ListTile(
-                    leading: const Icon(Icons.link),
-                    title: Text(entry.key),
-                    subtitle: Text(entry.value),
-                    contentPadding: EdgeInsets.zero,
-                  )).toList(),
+                  if (_profile?.socialLinks?.isNotEmpty ?? false)
+                    ...(_profile?.socialLinks?.entries.map((entry) => ListTile(
+                      leading: const Icon(Icons.link),
+                      title: Text(entry.key),
+                      subtitle: Text(entry.value),
+                      contentPadding: EdgeInsets.zero,
+                    )).toList() ?? [])
+                  else
+                    const ListTile(
+                      leading: Icon(Icons.link, color: Colors.grey),
+                      title: Text('No social links added', style: TextStyle(color: Colors.grey)),
+                      contentPadding: EdgeInsets.zero,
+                    ),
                 ],
-              ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -358,13 +402,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: TextFormField(
-                  controller: _genderController,
+                child: DropdownButtonFormField<String>(
+                  value: _genderController.text.isEmpty ? null : _genderController.text,
                   decoration: const InputDecoration(
                     labelText: 'Gender',
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.person_outline),
                   ),
+                  items: const [
+                    DropdownMenuItem(value: 'Male', child: Text('Male')),
+                    DropdownMenuItem(value: 'Female', child: Text('Female')),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) {
+                      _genderController.text = value;
+                    }
+                  },
                 ),
               ),
             ],
@@ -398,16 +451,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             maxLines: 2,
           ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _websiteController,
-            decoration: const InputDecoration(
-              labelText: 'Website',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.language),
-            ),
-            keyboardType: TextInputType.url,
-          ),
+
           const SizedBox(height: 16),
           ExpansionTile(
             title: const Text('Interests'),
@@ -579,7 +623,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _birthDateController.dispose();
     _genderController.dispose();
     _occupationController.dispose();
-    _websiteController.dispose();
+
     super.dispose();
   }
 }

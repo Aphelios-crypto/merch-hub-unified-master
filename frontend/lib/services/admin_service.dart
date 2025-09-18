@@ -121,11 +121,19 @@ class AdminService {
         } else {
           return [];
         }
+      } else if (response.statusCode == 401) {
+        throw Exception('Authentication failed - please login again');
+      } else {
+        print('Error fetching listings: ${response.statusCode} - ${response.body}');
+        return [];
       }
     } catch (e) {
-      // Handle error silently
+      if (e.toString().contains('Authentication failed')) {
+        rethrow;
+      }
+      print('Exception fetching listings: $e');
+      return [];
     }
-    return [];
   }
 
   static Future<List<Listing>> getAdminListings() async {
