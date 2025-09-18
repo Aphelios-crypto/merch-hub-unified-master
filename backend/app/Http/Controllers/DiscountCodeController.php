@@ -278,7 +278,7 @@ class DiscountCodeController extends Controller
     /**
      * Validate a discount code for an order (Public endpoint for students)
      */
-    public function validate(Request $request): JsonResponse
+    public function validateCode(Request $request): JsonResponse
     {
         try {
             $validated = $request->validate([

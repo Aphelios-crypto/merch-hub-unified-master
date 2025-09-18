@@ -129,7 +129,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders/{id}/upload-receipt', [OrderController::class, 'uploadReceipt']);
     
     // Discount code validation route
-    Route::post('/discount-codes/validate', [DiscountCodeController::class, 'validate']);
+    Route::post('/discount-codes/validate', [DiscountCodeController::class, 'validateCode']);
     Route::post('/discount-codes/calculate', [DiscountCodeController::class, 'calculate']);
     
     // Notification routes (for all authenticated users)
