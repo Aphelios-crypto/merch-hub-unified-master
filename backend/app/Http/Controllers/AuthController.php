@@ -36,8 +36,13 @@ class AuthController extends Controller
         // Load department relationship for session data
         $user->load(['department', 'profile']);
 
-        // Send email verification notification
-        $user->sendEmailVerificationNotification();
+        // Send email verification notification only for regular users (students)
+        if ($user->role === 'student') {
+            $user->sendEmailVerificationNotification();
+        } else {
+            // For admin and superadmin, mark email as verified automatically
+            $user->markEmailAsVerified();
+        }
 
         // Generate token using Sanctum
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -63,8 +68,8 @@ class AuthController extends Controller
 
         $user = Auth::user();
         
-        // Check if email is verified
-        if (!$user->hasVerifiedEmail()) {
+        // Check if email is verified - only for regular users (students)
+        if ($user->role === 'student' && !$user->hasVerifiedEmail()) {
             // Resend verification email
             $user->sendEmailVerificationNotification();
             
@@ -73,6 +78,8 @@ class AuthController extends Controller
                 'email_verified' => false
             ], 403);
         }
+        
+        // Admin and superadmin users bypass email verification
         
         // Load department and profile relationships for session data
         $user->load(['department', 'profile']);

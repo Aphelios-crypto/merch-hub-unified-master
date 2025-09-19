@@ -22,7 +22,17 @@ Route::get('/ping', function () {
 // Email Verification Routes
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
-    return response()->json(['message' => 'Email verified successfully']);
+    
+    // For mobile apps, we need to redirect to a custom URL scheme that the app can handle
+    // This will be handled by the Android deep linking setup
+    // Using a direct redirect instead of redirect()->away() for better compatibility
+    
+    // Log the verification success
+    \Illuminate\Support\Facades\Log::info('Email verification successful for user: ' . $request->user()->id);
+    
+    return response()->view('redirect', [
+        'url' => 'merch-hub://email-verification-success'
+    ]);
 })->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
 
 Route::post('/email/verification-notification', function (Request $request) {
@@ -110,14 +120,14 @@ Route::get('/email/verify/{id}/{hash}', function (Request $request) {
     }
     
     if ($user->hasVerifiedEmail()) {
-        return response()->json(['message' => 'Email already verified']);
+        return redirect(env('FRONTEND_URL', 'http://localhost:3000') . '/email-verification-success');
     }
     
     if ($user->markEmailAsVerified()) {
         event(new \Illuminate\Auth\Events\Verified($user));
     }
     
-    return response()->json(['message' => 'Email verified successfully']);
+    return redirect(env('FRONTEND_URL', 'http://localhost:3000') . '/email-verification-success');
 })->middleware(['signed'])->name('verification.verify');
 
 Route::post('/email/verification-notification', function (Request $request) {

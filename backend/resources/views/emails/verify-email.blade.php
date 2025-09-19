@@ -32,6 +32,16 @@
             <p>If the button doesn't work, you can also copy and paste the following link into your browser:</p>
             <p style="word-break: break-all;">{{ $verificationUrl }}</p>
             
+            <p style="background-color: #f0f4ff; padding: 15px; border-left: 4px solid #1E3A8A; margin: 20px 0;">
+                <strong>Mobile App Users:</strong> When using Gmail or other email apps on your mobile device:
+                <br><br>
+                1. If clicking the button doesn't work, try opening the link in your device's browser first
+                <br>
+                2. After verification, you'll be redirected to open the UDD Merch Hub app automatically
+                <br>
+                3. If redirection fails, simply open the app manually - your email will be verified
+            </p>
+            
             <p>This verification link will expire in 60 minutes.</p>
             
             <p>If you did not create an account, no further action is required.</p>

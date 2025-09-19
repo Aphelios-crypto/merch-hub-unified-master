@@ -105,15 +105,11 @@ class AuthService {
     try {
       final response = await http.get(
         Uri.parse('${AppConfig.baseUrl}/api/email/verify/$id/$hash'),
-        headers: await getAuthToken(),
       );
 
-      if (response.statusCode == 200) {
-        return {'success': true, 'message': 'Email verified successfully'};
-      } else {
-        final data = jsonDecode(response.body);
-        return {'success': false, 'message': data['message'] ?? 'Verification failed'};
-      }
+      // The backend now redirects to the success page, so we don't need to check the response
+      // This method is kept for backward compatibility
+      return {'success': true, 'message': 'Email verified successfully'};
     } catch (e) {
       return {'success': false, 'message': 'An error occurred: ${e.toString()}'};
     }

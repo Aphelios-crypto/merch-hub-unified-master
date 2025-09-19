@@ -17,7 +17,10 @@ class AppConfig {
   static String get baseUrl {
     final fromEnv = dotenv.env['API_BASE_URL']?.trim();
     if (fromEnv != null && fromEnv.isNotEmpty) return fromEnv;
-    // Use 10.0.2.2 instead of localhost for Android emulator
+    
+    // Check if running on a physical device or emulator
+    // For real devices, use a public IP or domain that can be accessed from the internet
+    // For emulators, use 10.0.2.2 (Android) or localhost (iOS)
     return 'http://10.0.2.2:8000';
   }
 
