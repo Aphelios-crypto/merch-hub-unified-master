@@ -881,8 +881,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your email address';
                             }
-                            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                .hasMatch(value)) {
+                            if (!value.contains('@')) {
                               return 'Please enter a valid email address';
                             }
                             return null;

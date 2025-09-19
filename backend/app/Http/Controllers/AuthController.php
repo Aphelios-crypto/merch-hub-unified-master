@@ -36,12 +36,16 @@ class AuthController extends Controller
         // Load department relationship for session data
         $user->load(['department', 'profile']);
 
+        // Send email verification notification
+        $user->sendEmailVerificationNotification();
+
         // Generate token using Sanctum
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'user' => $user->getSessionData(),
             'token' => $token,
+            'message' => 'Registration successful. Please check your email to verify your account.',
         ], 201);
     }
 
@@ -58,6 +62,18 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
+        
+        // Check if email is verified
+        if (!$user->hasVerifiedEmail()) {
+            // Resend verification email
+            $user->sendEmailVerificationNotification();
+            
+            return response()->json([
+                'message' => 'Email not verified. A new verification link has been sent to your email address.',
+                'email_verified' => false
+            ], 403);
+        }
+        
         // Load department and profile relationships for session data
         $user->load(['department', 'profile']);
 
@@ -75,6 +91,7 @@ class AuthController extends Controller
         return response()->json([
             'user' => $user->getSessionData(),
             'token' => $token,
+            'email_verified' => true
         ]);
     }
 

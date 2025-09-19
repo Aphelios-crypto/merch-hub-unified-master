@@ -12,11 +12,23 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\DiscountCodeController;
 use Illuminate\Support\Facades\File;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
 Route::get('/ping', function () {
     return response()->json(['message' => 'pong']);
 });
+
+// Email Verification Routes
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return response()->json(['message' => 'Email verified successfully']);
+})->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return response()->json(['message' => 'Verification link sent']);
+})->middleware(['auth:sanctum', 'throttle:6,1'])->name('verification.send');
 
 // Test email route
 Route::get('/test-email', function () {
@@ -88,6 +100,30 @@ Route::get('/departments', [DepartmentController::class, 'index']);
 
 // Public listings endpoint for guest users
 Route::get('/public/listings', [ListingController::class, 'index']);
+
+// Email Verification Routes
+Route::get('/email/verify/{id}/{hash}', function (Request $request) {
+    $user = \App\Models\User::find($request->route('id'));
+    
+    if (!$user) {
+        return response()->json(['message' => 'User not found'], 404);
+    }
+    
+    if ($user->hasVerifiedEmail()) {
+        return response()->json(['message' => 'Email already verified']);
+    }
+    
+    if ($user->markEmailAsVerified()) {
+        event(new \Illuminate\Auth\Events\Verified($user));
+    }
+    
+    return response()->json(['message' => 'Email verified successfully']);
+})->middleware(['signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return response()->json(['message' => 'Verification link sent']);
+})->middleware(['auth:sanctum', 'throttle:6,1'])->name('verification.send');
 
 // Public file serving for uploaded assets (avoids 403 on /storage symlink)
 Route::get('/files/{path}', function ($path) {

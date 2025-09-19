@@ -361,7 +361,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               prefixIcon: Icon(Icons.email),
             ),
             keyboardType: TextInputType.emailAddress,
-            validator: (value) => value!.isEmpty ? 'Email is required' : null,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Email is required';
+              }
+              if (!value.contains('@')) {
+                return 'Please enter a valid email address';
+              }
+              return null;
+            },
           ),
           const SizedBox(height: 16),
           TextFormField(

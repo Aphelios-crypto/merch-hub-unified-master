@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../config/app_config.dart';
 import '../styles/auth_styles.dart';
 import '../models/user_role.dart';
+import '../services/auth_services.dart';
 
 class LoginScreen extends StatefulWidget {
   final String? returnRoute;
@@ -39,39 +40,28 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => isLoading = true);
 
-    final url = AppConfig.api('login');
-
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json', // Add Accept header
-        },
-        body: jsonEncode({
-          'email': emailController.text.trim(),
-          'password': passwordController.text,
-        }),
+      final result = await AuthService.login(
+        emailController.text.trim(),
+        passwordController.text,
       );
 
-      final data = jsonDecode(response.body);
       setState(() => isLoading = false);
 
-      if (response.statusCode == 200 && data['token'] != null) {
-        final token = data['token'];
-        final userData = data['user'];
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('auth_token', token);
-        await prefs.setString('user_data', jsonEncode(userData));
-        
-        // Clear guest mode after successful login
-        await prefs.remove('is_guest_mode');
+      if (!mounted) return;
+
+      if (result['success']) {
+        // Get user data from shared preferences
+        final userData = await AuthService.getCurrentUser();
+        if (userData == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to get user data')),
+          );
+          return;
+        }
 
         // Create UserSession object using fromJson for consistency
         final userSession = UserSession.fromJson(userData);
-
-        // Navigate based on role or return route
-        if (!mounted) return;
 
         // If there's a return route, navigate directly to it
         if (widget.returnRoute != null) {
@@ -133,16 +123,96 @@ class _LoginScreenState extends State<LoginScreen> {
             }
           });
         }
+      } else if (result.containsKey('email_verified') && result['email_verified'] == false) {
+        // Email not verified case
+        _showVerificationDialog(result['message']);
       } else {
+        // General error case
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(data['message'] ?? 'Login failed')),
+          SnackBar(content: Text(result['message'] ?? 'Login failed')),
         );
       }
     } catch (e) {
       setState(() => isLoading = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Network error')));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred: ${e.toString()}')),
+      );
+    }
+  }
+  
+  // Show dialog for email verification
+  void _showVerificationDialog(String? message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Email Verification Required'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: [
+                Text(message ?? 'Please verify your email before logging in.'),
+                const SizedBox(height: 16),
+                const Text('Would you like us to send a new verification email?'),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Resend Email'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                _resendVerificationEmail();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  
+  // Resend verification email
+  Future<void> _resendVerificationEmail() async {
+    setState(() => isLoading = true);
+    
+    try {
+      // First login to get token
+      final loginResult = await AuthService.login(
+        emailController.text.trim(),
+        passwordController.text,
+      );
+      
+      if (!loginResult['success']) {
+        // Login failed, but we still want to try resending
+        // This is a special case where we want to resend even if login fails due to verification
+      }
+      
+      // Now try to resend verification email
+      final result = await AuthService.resendVerificationEmail();
+      
+      setState(() => isLoading = false);
+      if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message'] ?? 'Verification email sent'),
+          backgroundColor: result['success'] ? Colors.green : Colors.red,
+        ),
+      );
+    } catch (e) {
+      setState(() => isLoading = false);
+      if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to resend: ${e.toString()}')),
+      );
     }
   }
 
@@ -258,7 +328,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 return 'Please enter your email';
                               }
                               if (!value.contains('@')) {
-                                return 'Please enter a valid email';
+                                return 'Please enter a valid email address';
                               }
                               return null;
                             },

@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../styles/auth_styles.dart';
 import 'login_screen.dart';
+import '../config/app_config.dart';
+import '../services/auth_services.dart';
 
 class RegisterScreen extends StatefulWidget {
   final String? returnRoute;
@@ -106,8 +108,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         (dept) => dept['name'] == _selectedDepartment,
       );
 
+      // First register using HTTP to include department_id and role
+      // (These fields are not part of the AuthService.register method)
       final response = await http.post(
-        Uri.parse('http://localhost:8000/api/register'),
+        AppConfig.api('register'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -122,46 +126,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
         }),
       );
 
-      if (response.statusCode == 201) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Registration successful! Please login.'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          
-          // Navigate to login screen with return route info
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => LoginScreen(
-                returnRoute: widget.returnRoute,
-                returnArguments: widget.returnArguments,
-              ),
-            ),
-          );
-        }
+      final data = jsonDecode(response.body);
+      
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (!mounted) return;
+        
+        // Show success message with verification instructions
+        _showVerificationSuccessDialog(data['message'] ?? 'Registration successful! Please check your email for verification link.');
       } else {
-        final errorData = jsonDecode(response.body);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(errorData['message'] ?? 'Registration failed'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
+        if (!mounted) return;
+        
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Network error. Please try again.'),
+          SnackBar(
+            content: Text(data['message'] ?? 'Registration failed'),
             backgroundColor: Colors.red,
           ),
         );
       }
+    } catch (e) {
+      if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Network error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -169,6 +159,46 @@ class _RegisterScreenState extends State<RegisterScreen> {
         });
       }
     }
+  }
+  
+  // Show success dialog with verification instructions
+  void _showVerificationSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Registration Successful'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: [
+                Text(message),
+                const SizedBox(height: 16),
+                const Text('Please check your email for a verification link. You need to verify your email before you can log in.'),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Go to Login'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Navigate to login screen with return route info
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginScreen(
+                      returnRoute: widget.returnRoute,
+                      returnArguments: widget.returnArguments,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -289,8 +319,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter your email';
                                 }
-                                if (!value.contains('@')) {
-                                  return 'Please enter a valid email';
+                                // Comprehensive email validation using regex
+                                final emailRegex = RegExp(
+                                  r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                                );
+                                if (!emailRegex.hasMatch(value)) {
+                                  return 'Please enter a valid email address';
+                                }
+                                // Additional validation for common domains
+                                final domainPart = value.split('@').last.toLowerCase();
+                                if (domainPart == 'example.com' || 
+                                    domainPart == 'test.com' || 
+                                    domainPart == 'domain.com') {
+                                  return 'Please use a real email address';
                                 }
                                 return null;
                               },
